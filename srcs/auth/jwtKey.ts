@@ -15,3 +15,11 @@ export function getOrCreateJwtKey(): string {
   fs.writeFileSync(keyPath, newKey, { mode: 0o600 }); // restrict permissions
   return newKey;
 }
+
+fastify.decorate("authenticate", async function (request, reply) {
+  try {
+    await request.jwtVerify()
+  } catch (err) {
+    reply.send(err)
+  }
+})
