@@ -3,7 +3,7 @@ import { createUser, logInUser } from '../services/userService';
 
 
 
-
+//Backend never gets the unhashed password so we can only test if it looks like a valid hash
 function looksLikeBcrypt(hash: string): boolean {
   // Regex: start with $2a$, $2b$, or $2y$, then 2 digits (cost), then 53 chars of salt+hash
   const bcryptRegex = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
@@ -11,12 +11,14 @@ function looksLikeBcrypt(hash: string): boolean {
 }
 
 
+//Thiis tries to create a new user
 export default async function userRoutes(fastify: FastifyInstance) {
   fastify.post('/users', async (request, reply) => {
     const { username, password } = request.body as {
       username: string;
       password: string; // already hashed
     };
+
 
     if (!username || !password) {
       return reply.status(400).send({ error: 'Missing username or password' });
@@ -38,6 +40,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
+  //login function that returns the JWT token on success 
   fastify.post('/auth/login', async (request, reply) => {
     const { username, password } = request.body as {
       username: string;

@@ -30,3 +30,5 @@ details, accessible to logged-in users.
 @fastify/swagger
 
 OPENAPI
+
+What happens when the user times out

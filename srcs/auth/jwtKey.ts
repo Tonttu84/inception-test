@@ -3,8 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+
 const keyPath = path.join(__dirname, '../../data/jwt.key');
 
+
+//Gets or returns the JWT Key.
 export function getOrCreateJwtKey(): string {
   if (fs.existsSync(keyPath)) {
     return fs.readFileSync(keyPath, 'utf8');
@@ -16,10 +19,3 @@ export function getOrCreateJwtKey(): string {
   return newKey;
 }
 
-fastify.decorate("authenticate", async function (request, reply) {
-  try {
-    await request.jwtVerify()
-  } catch (err) {
-    reply.send(err)
-  }
-})

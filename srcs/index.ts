@@ -1,27 +1,30 @@
 // srcs/index.ts
 import Fastify from 'fastify';
 import fastifyJwt from '@fastify/jwt';
-import { jwtKey } from './db/client';   
+import { jwtKey } from './db/client';
+import { initSchema } from './db/schema';
 import userRoutes from './routes/user';
+import tournamentRoutes from './routes/tournament';
 
-const transcendence_server = Fastify({ logger: true });
+const app = Fastify({ logger: true });
 
+// Initialize schema once at startup
+initSchema();
 
-transcendence_server.register(fastifyJwt, {
+app.register(fastifyJwt, {
   secret: jwtKey,
-  sign: { expiresIn: '1h' } 
+  sign: { expiresIn: '1h' }
 });
 
+app.register(userRoutes);
+app.register(tournamentRoutes);
 
-transcendence_server.register(userRoutes);
-
-// Start the server
-transcendence_server.listen({ port: 3000 }, (err, address) => {
+app.listen({ port: 3000 }, (err, address) => {
   if (err) {
-    transcendence_server.log.error(err);
+    app.log.error(err);
     process.exit(1);
   }
-  transcendence_server.log.info(`Server listening at ${address}`);
+  app.log.info(`Server listening at ${address}`);
 });
 
-export default transcendence_server;
+export default app;
