@@ -1,0 +1,61 @@
+// Tournament API Reference Types
+
+// ---------- CREATE ----------
+/**
+ * POST /tournament/create
+ * Body: { name: string }
+ */
+type CreateTournamentRequest = { name: string };
+type CreateTournamentResponse =
+  | { success: true; tournamentId: number } // created successfully
+  | { error: "A tournament is already active" }; // blocked by existing tournament
+
+// ---------- JOIN ----------
+/**
+ * POST /tournament/join
+ * Body: { alias?: string | null }
+ */
+type JoinTournamentRequest = { alias?: string | null };
+type JoinTournamentResponse =
+  | { success: true } // joined successfully
+  | { error: "No joinable tournament" }
+  | { error: "Alias cannot be an existing username" }
+  | { error: "Already joined or alias taken" }
+  | { error: "Internal error: multiple open tournaments" }; // invariant violation
+
+// ---------- START ----------
+/**
+ * POST /tournament/start
+ * Body: none
+ */
+type StartTournamentResponse =
+  | { success: true; tournamentId: number } // started successfully
+  | { error: "No tournament waiting to start" }
+  | { error: "Tournament requires 4, 8, 16, 32, ... players to start" }
+  | { error: "Internal error: multiple open tournaments" }; // invariant violation
+
+// ---------- NEXT MATCH ----------
+/**
+ * GET /tournament/next-match
+ * Body: none
+ */
+type NextMatchResponse =
+  | { player1: string; player2: string } // next match pairing
+  | { winner: string } // only one alive → tournament finished
+  | { error: "No started tournament" }
+  | { error: "Internal error: multiple started tournaments" }
+  | { error: "No alive players — tournament data corrupted" };
+
+// ---------- RESOLVE MATCH ----------
+/**
+ * POST /tournament/resolve-match
+ * Body: { winnerAlias: string; loserAlias: string }
+ */
+type ResolveMatchRequest = { winnerAlias: string; loserAlias: string };
+type ResolveMatchResponse =
+  | { success: true; winner: string; loser: string } // match resolved
+  | { error: "No started tournament" }
+  | { error: "Both players must exist and be in the tournament" }
+  | { error: "Invalid aliases provided" }
+  | { error: "Both players must be alive to resolve a match" }
+  | { error: "Internal error: multiple started tournaments" };
